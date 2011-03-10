@@ -930,3 +930,15 @@
 (require 'rinari)
 (setq rinari-tags-file-name "TAGS")
 
+;; Make Less CSS auto-compile on save, and use CSS editing mode.
+;; Stolen from http://gugod.org/2010/01/recommending-lesscss.html
+(defun compile-less-css ()
+  "Compile LESS to CSS"
+  (interactive)
+  (if (string-match "\.less$" (buffer-file-name))
+      (save-window-excursion (async-shell-command (concat "lessc " (buffer-file-name)) nil nil))))
+
+(add-hook 'after-save-hook 'compile-less-css)
+
+(setq auto-mode-alist (cons '("\\.less$" . css-mode) auto-mode-alist))
+
