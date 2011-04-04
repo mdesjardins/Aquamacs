@@ -942,3 +942,5 @@
 
 (setq auto-mode-alist (cons '("\\.less$" . css-mode) auto-mode-alist))
 
+(require 'color-theme-sanityinc-solarized)
+(color-theme-sanityinc-solarized-dark)
