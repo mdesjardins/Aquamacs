@@ -867,6 +867,7 @@
 (global-set-key "\C-cc" 'source-checkin)
 (global-set-key "\C-co" 'source-checkout)
 (global-set-key "\C-ct" 'my-tag-builder)
+(global-set-key (kbd "M-/") 'comment-or-uncomment-region)
 
 ;; ============================
 ;; End of Options Menu Settings
@@ -885,6 +886,7 @@
 (define-key minibuffer-local-filename-completion-map (kbd "SPC")
 'minibuffer-complete-word)
 
+; OSX Stuff
 (define-key minibuffer-local-must-match-filename-map (kbd "SPC")
 'minibuffer-complete-word)
 
@@ -893,7 +895,6 @@
 (global-set-key (kbd "M-s") 'save-buffer)
 (global-set-key (kbd "M-v") 'yank)
 (global-set-key (kbd "M-c") 'kill-ring-save)
-;(global-set-key (kbd "M-x") 'copy-to-buffer)
 (global-set-key (kbd "M-z") 'undo)
 (global-set-key (kbd "M-{") 'previous-tab-or-buffer)
 (global-set-key (kbd "M-}") 'next-tab-or-buffer)
@@ -905,6 +906,7 @@
 
 (setq auto-mode-alist (cons '("\\.rake\\'" . ruby-mode) auto-mode-alist))
 
+; Make Cmd-H hide (sorta)
 (defun iconify-or-deiconify-frame-fullscreen-even ()
    (interactive)
    (if (eq (cdr (assq 'visibility (frame-parameters))) t)
@@ -926,7 +928,6 @@
 (ido-mode t)
      
 ;; Rinari
-(add-to-list 'load-path "~/path/to/your/elisp/rinari")
 (require 'rinari)
 (setq rinari-tags-file-name "TAGS")
 
@@ -938,9 +939,92 @@
   (if (string-match "\.less$" (buffer-file-name))
       (save-window-excursion (async-shell-command (concat "lessc " (buffer-file-name)) nil nil))))
 
-(add-hook 'after-save-hook 'compile-less-css)
+;(defun new-tags-file ()
+;  "Regenerate TAGS file"
+;  (interactive)
+;  (if (string-match "\.rb$" (buffer-file-name))
+;      (save-window-excursion (async-shell-command "/usr/local/bin/ctags -f /Users/mdesjardins/_work/elctech/src/TAGS -e -R --exclude=.git --exclude=log --exclude=tmp /Users/mdesjardins/_work/elctech/src/*" nil)) nil nil))
 
+;(add-hook 'after-save-hook 'new-tags-file)
+
+; Compile LESS into CSS
+(add-hook 'after-save-hook 'compile-less-css)
 (setq auto-mode-alist (cons '("\\.less$" . css-mode) auto-mode-alist))
 
-(require 'color-theme-sanityinc-solarized)
-(color-theme-sanityinc-solarized-dark)
+; Prettier colors
+(require 'color-theme)
+(eval-after-load "color-theme"
+  '(progn
+     (color-theme-initialize)
+     (color-theme-fooble)))
+
+; HAML Mode
+(require 'haml-mode)
+(add-hook 'haml-mode-hook
+  '(lambda ()
+     (setq indent-tabs-mode nil)
+     (define-key haml-mode-map "\C-m" 'newline-and-indent)))
+
+; Special kill-other-buffers command
+(defun kill-other-buffers ()
+    "Kill all other buffers."
+    (interactive)
+    (mapc 'kill-buffer 
+          (delq (current-buffer) 
+                (remove-if-not 'buffer-file-name (buffer-list)))))
+
+; RSpec mode stuff.
+(require 'rvm)
+(require 'el-expectations)
+(require 'rspec-mode)
+(setq rspec-use-rvm t)
+
+; Flymake JSLint w/ jslint w/ Node
+(when (load "flymake" t)
+  (defun flymake-jslint-init ()
+    (let* ((temp-file (flymake-init-create-temp-buffer-copy
+		       'flymake-create-temp-inplace))
+           (local-file (file-relative-name
+                        temp-file
+                        (file-name-directory buffer-file-name))))
+      (list "jslint" (list local-file))))
+
+  (setq flymake-err-line-patterns 
+	(cons '("^  [[:digit:]]+ \\([[:digit:]]+\\),\\([[:digit:]]+\\): \\(.+\\)$"  
+		nil 1 2 3)
+	      flymake-err-line-patterns))
+  
+  (add-to-list 'flymake-allowed-file-name-masks
+               '("\\.js\\'" flymake-jslint-init)))
+
+(add-hook 'javascript-mode-hook
+	  (lambda () (flymake-mode t)))
+
+(add-hook 'javascript-mode-hook '(lambda () (flymake-js-load)))
+
+; Two spaces instead of four in javascript mode
+(setq js-indent-level 2)
+
+; Make javascript mode indent with spaces instead of tabs
+(add-hook 'javascript-mode-hook
+  '(lambda () (progn
+    (set-variable 'indent-tabs-mode nil))))
+
+;; Enable scrolling to maintain mark if set
+(defun scroll-down-maintain-mark ()
+  (interactive)
+  (if mark-active
+      (aquamacs-page-down-extend-region)
+    (aquamacs-page-down)))
+
+(defun scroll-up-maintain-mark ()
+  (interactive)
+  (if mark-active
+      (aquamacs-page-up-extend-region)
+    (aquamacs-page-up)))
+
+(define-key global-map "\C-v" #'scroll-down-maintain-mark)
+(define-key global-map "\M-v" #'scroll-up-maintain-mark)
+
+
+
