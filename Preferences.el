@@ -875,9 +875,6 @@
 (setq minibuffer-max-depth nil)
 
 
-(setq load-path (cons (expand-file-name "~/Library/Preferences/Aquamacs Emacs/rails-reloaded") load-path))
-(require 'rails-reloaded)
-
 (remove-hook 'text-mode-hook 'auto-detect-wrap)
 
 ;;================================================ ============
@@ -898,6 +895,9 @@
 (global-set-key (kbd "M-z") 'undo)
 (global-set-key (kbd "M-{") 'previous-tab-or-buffer)
 (global-set-key (kbd "M-}") 'next-tab-or-buffer)
+(global-set-key (kbd "M-t") 'projectile-find-file)
+(global-set-key (kbd "A-+") 'zoom-font)
+(global-set-key (kbd "M-_") 'zoom-font-out)
 
 (define-key osx-key-mode-map [home] 'beginning-of-line)
 (define-key osx-key-mode-map [end] 'end-of-line)
@@ -924,13 +924,9 @@
 (global-set-key (kbd "M-h") #'iconify-or-deiconify-frame-fullscreen-even)
 
  ;; Interactively Do Things (highly recommended, but not strictly required)
-(require 'ido)
-(ido-mode t)
+;(require 'ido)
+;(ido-mode t)
      
-;; Rinari
-(require 'rinari)
-(setq rinari-tags-file-name "TAGS")
-
 ;; Make Less CSS auto-compile on save, and use CSS editing mode.
 ;; Stolen from http://gugod.org/2010/01/recommending-lesscss.html
 (defun compile-less-css ()
@@ -939,24 +935,18 @@
   (if (string-match "\.less$" (buffer-file-name))
       (save-window-excursion (async-shell-command (concat "lessc " (buffer-file-name)) nil nil))))
 
-;(defun new-tags-file ()
-;  "Regenerate TAGS file"
-;  (interactive)
-;  (if (string-match "\.rb$" (buffer-file-name))
-;      (save-window-excursion (async-shell-command "/usr/local/bin/ctags -f /Users/mdesjardins/_work/elctech/src/TAGS -e -R --exclude=.git --exclude=log --exclude=tmp /Users/mdesjardins/_work/elctech/src/*" nil)) nil nil))
-
-;(add-hook 'after-save-hook 'new-tags-file)
-
 ; Compile LESS into CSS
 (add-hook 'after-save-hook 'compile-less-css)
 (setq auto-mode-alist (cons '("\\.less$" . css-mode) auto-mode-alist))
 
 ; Prettier colors
 (require 'color-theme)
+(load "~/Library/Preferences/Aquamacs Emacs/themes/color-theme-molokai.el")
 (eval-after-load "color-theme"
   '(progn
      (color-theme-initialize)
-     (color-theme-fooble)))
+     (color-theme-molokai)))
+
 
 ; HAML Mode
 (require 'haml-mode)
@@ -1026,5 +1016,25 @@
 (define-key global-map "\C-v" #'scroll-down-maintain-mark)
 (define-key global-map "\M-v" #'scroll-up-maintain-mark)
 
+(require 'auto-install)
+(setq auto-install-directory "~/Library/Preferences/Aquamacs Emacs/auto-install/")
+(setq auto-install-save-confirm nil)
+(add-to-list 'load-path "~/Library/Preferences/Aquamacs Emacs/auto-install")
 
+(require 'package)
+(add-to-list 'package-archives
+             '("marmalade" . "http://marmalade-repo.org/packages/"))
+(add-to-list 'package-archives
+              '("elpa" . "http://tromey.com/elpa/"))
+(package-initialize)
+
+;(add-to-list 'load-path (cons (expand-file-name "~/Library/Preferences/Aquamacs Emacs/helm")))
+(add-to-list 'load-path "~/Library/Preferences/Aquamacs Emacs/helm")
+(require 'helm-config)
+(require 'helm-find-files-in-project)
+
+(add-to-list 'load-path "~/Library/Application Support/Aquamacs Emacs/elpa")
+(projectile-global-mode)
+(setq projectile-enable-caching t)
+(global-set-key (kbd "M-F") 'projectile-grep)
 
