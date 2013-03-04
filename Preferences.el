@@ -1016,10 +1016,10 @@
 (define-key global-map "\C-v" #'scroll-down-maintain-mark)
 (define-key global-map "\M-v" #'scroll-up-maintain-mark)
 
-(require 'auto-install)
-(setq auto-install-directory "~/Library/Preferences/Aquamacs Emacs/auto-install/")
-(setq auto-install-save-confirm nil)
-(add-to-list 'load-path "~/Library/Preferences/Aquamacs Emacs/auto-install")
+;(require 'auto-install)
+;(setq auto-install-directory "~/Library/Preferences/Aquamacs Emacs/auto-install/")
+;(setq auto-install-save-confirm nil)
+;(add-to-list 'load-path "~/Library/Preferences/Aquamacs Emacs/auto-install")
 
 (require 'package)
 (add-to-list 'package-archives
@@ -1029,9 +1029,9 @@
 (package-initialize)
 
 ;(add-to-list 'load-path (cons (expand-file-name "~/Library/Preferences/Aquamacs Emacs/helm")))
-(add-to-list 'load-path "~/Library/Preferences/Aquamacs Emacs/helm")
-(require 'helm-config)
-(require 'helm-find-files-in-project)
+;(add-to-list 'load-path "~/Library/Preferences/Aquamacs Emacs/helm")
+;(require 'helm-config)
+;(require 'helm-find-files-in-project)
 
 (add-to-list 'load-path "~/Library/Application Support/Aquamacs Emacs/elpa")
 (projectile-global-mode)
